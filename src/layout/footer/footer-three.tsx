@@ -2,11 +2,12 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 // internal
-import logo from '@/assets/images/logo/logo.svg';
+// import logo from '@/assets/images/logo/logo.svg';
 import shape_1 from '@/assets/images/shape/shape_36.svg';
 import shape_2 from '@/assets/images/shape/shape_37.svg';
 import shape_3 from '@/assets/images/shape/shape_39.svg';
 import FooterSocial from './footer-social';
+import LogoText from '@/components/common/logo-text';
 
 const FooterThree = ({ style_2 }: { style_2?: boolean }) => {
   return (
@@ -21,9 +22,10 @@ const FooterThree = ({ style_2 }: { style_2?: boolean }) => {
                 } rounded-circle text-center d-flex flex-column align-items-center justify-content-center`}
               >
                 <div className="logo mb-15">
-                  <Link href="/">
+                  {/* <Link href="/">
                     <Image src={logo} alt="logo" width={150} />
-                  </Link>
+                  </Link> */}
+                  <LogoText />
                 </div>
                 <p className="lh-sm mb-45 lg-mb-30">
                   2190 Urban Terrace, Mirpur, <br />
