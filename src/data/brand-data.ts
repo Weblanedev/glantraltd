@@ -1,6 +1,6 @@
 const brand_data = {
   name: 'Glantra',
-  full_name: 'Glantra Limited ',
+  full_name: 'Glantra Limited',
   slogan: 'More than just computers',
   description: 'Glantra is your one-stop-shop for your global computing needs.',
   phone: '09088199087',

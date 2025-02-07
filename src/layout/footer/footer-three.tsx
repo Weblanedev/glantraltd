@@ -8,6 +8,7 @@ import shape_2 from '@/assets/images/shape/shape_37.svg';
 import shape_3 from '@/assets/images/shape/shape_39.svg';
 import FooterSocial from './footer-social';
 import LogoText from '@/components/common/logo-text';
+import brand_data from '@/data/brand-data';
 
 const FooterThree = ({ style_2 }: { style_2?: boolean }) => {
   return (
@@ -27,12 +28,11 @@ const FooterThree = ({ style_2 }: { style_2?: boolean }) => {
                   </Link> */}
                   <LogoText />
                 </div>
-                <p className="lh-sm mb-45 lg-mb-30">
-                  2190 Urban Terrace, Mirpur, <br />
-                  Licensed in 50 states.
-                </p>
+                <p className="lh-sm mb-45 lg-mb-30">{brand_data.address}</p>
                 <p className="m0">
-                  <Link href="#">+757 699-4478</Link>
+                  <Link href={`tel:${brand_data.phone}`}>
+                    {brand_data.phone}
+                  </Link>
                 </p>
               </div>
             </div>
@@ -131,7 +131,7 @@ const FooterThree = ({ style_2 }: { style_2?: boolean }) => {
             </div>
             <div className="col-xl-4 col-lg-3 order-lg-1 mb-15">
               <div className="copyright text-center text-lg-start order-lg-first">
-                Copyright @{new Date().getFullYear()} babun inc.
+                Copyright @{new Date().getFullYear()} {brand_data.full_name}.
               </div>
             </div>
           </div>

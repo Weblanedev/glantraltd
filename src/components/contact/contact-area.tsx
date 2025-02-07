@@ -6,6 +6,7 @@ import icon_2 from '@/assets/images/icon/icon_91.svg';
 import icon_3 from '@/assets/images/icon/icon_92.svg';
 import icon_4 from '@/assets/images/assets/ils_07.svg';
 import ContactForm from '../forms/contact-form';
+import brand_data from '@/data/brand-data';
 
 // address block item
 function AddressBlock({
@@ -40,21 +41,21 @@ const ContactArea = () => {
                   <AddressBlock
                     icon={icon_1}
                     title="Our Address"
-                    subtitle="1012 Pebda Parkway, Mirpur 2 <br/>Dhaka, Bangladesh"
+                    subtitle={brand_data.address}
                   />
                 </div>
                 <div className="col-md-4">
                   <AddressBlock
                     icon={icon_2}
                     title="Contact Info"
-                    subtitle='Open a chat or give us call at <br/><a href="tel:310.841.5500" className="call text-lg fw-500">310.841.5500</a>'
+                    subtitle={`Open a chat or give us call at <br/><a href="tel:${brand_data.phone}" className="call text-lg fw-500">${brand_data.phone}</a>`}
                   />
                 </div>
                 <div className="col-md-4">
                   <AddressBlock
                     icon={icon_3}
                     title="24/7 Support"
-                    subtitle='Send us a message <br/><a href="mailto:contact@xaviro.com" className="webaddress">contact@xaviro.com</a>'
+                    subtitle={`Send us a message <br/><a href="mailto:${brand_data.email}" className="webaddress">${brand_data.email}</a>`}
                   />
                 </div>
               </div>
