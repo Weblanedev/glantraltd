@@ -14,7 +14,8 @@ import FooterThree from '@/layout/footer/footer-three';
 import PortfolioOne from '@/components/portfolio/portfolio-one';
 
 export const metadata: Metadata = {
-  title: 'Home - Xaviro Limited',
+  title: 'Home - Glantra Store',
+  description: 'Welcome to Glantra Store - Your one-stop-shop for your global computing needs.',
 };
 
 export default function HomePageThree() {

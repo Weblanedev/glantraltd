@@ -10,7 +10,22 @@ import shape from '@/assets/images/shape/shape_33.svg';
 import HeaderThree from '@/layout/header/header-three';
 
 export const metadata: Metadata = {
-  title: 'Contact Page - Xaviro Limited',
+  title: 'Contact Page - Glantra Store',
+  description: 'Contact us for inquiries and support. We are here to help you with your global computing needs.',
+  keywords: 'contact, support, inquiries, global computing, technology',
+  authors: [{ name: 'Glantra Store' }],
+  openGraph: {
+    title: 'Glantra Store - Contact Us',
+    description: 'Contact us for inquiries and support. We are here to help you with your global computing needs.',
+    url: 'https://glantrastore.com',
+    siteName: 'Glantra Store',
+    images: [{ url: '/logo.png' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Glantra Store - Contact Us',
+    description: 'Contact us for inquiries and support. We are here to help you with your global computing needs.',
+  },
 };
 
 const ContactPage = () => {

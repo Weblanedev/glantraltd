@@ -11,7 +11,8 @@ import BlogsHomeFive from '@/components/blogs/home-5-blogs';
 import FooterFive from '@/layout/footer/footer-five';
 
 export const metadata: Metadata = {
-  title: 'Xaviro',
+  title: 'Home - Glantra Store',
+  description: 'Welcome to Glantra Store - Your one-stop-shop for your global computing needs.',
 };
 
 export default function HomePageFive() {
