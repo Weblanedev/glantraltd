@@ -1,0 +1,3 @@
+[build.environment]
+  # Next.js 16+ requires Node >= 20.9.0 (Netlify defaults to 18)
+  NODE_VERSION = "20"
