@@ -1,185 +1,278 @@
-## 0. Project Overview
-Build a full-stack **Next.js 14 (App Router) e-commerce web application** called **TechVault** — a storefront for **computers, laptops, monitors, PC components, and accessories** (keyboards, mice, headsets, cables, etc.). Product data comes from the **Best Buy Products API** (public REST API; you are responsible for complying with [Best Buy's API terms](https://developer.bestbuy.com) and acceptable use).
-**Best Buy Products API (reference):**
-- **Base URL:** `https://api.bestbuy.com/v1/`
-- **Catalog:** 1M+ current & historical products
-- **Page size:** 10 default, **100 max** per request
-- **Pricing:** Near real-time updates (per API docs)
-- **Optional SDK:** `npm install bestbuy`
-**Key facts for this app:**
-- **Currency:** **USD** — display prices from the API (`salePrice` / `regularPrice` as returned). Format with `$` and sensible rounding.
-- **Product identity:** Use Best Buy **`sku`** as the stable identifier (detail URLs: `/products/[sku]`).
-- **Images:** Use **`image`** / **`largeFront`** (or equivalent fields from API responses) — configure `next/image` `remotePatterns` for Best Buy CDN hostnames.
-- **Auth:** Same pattern as the reference build — simple in-memory user store (`data/users.json`) — no external DB required yet.
-- **Payment:** Simulated gateway (5-second loader → friendly error → redirect home, **cart preserved**).
-- **Member pricing:** **Simulated** — e.g. logged-in users see **5% below** the current `salePrice` (or a fixed rule you document in code comments). This is **not** Best Buy checkout; it is a demo storefront.
-- **API key security:** **Never** expose `BESTBUY_API_KEY` to the browser. All Best Buy calls go through **Next.js Route Handlers** (`app/api/...`) or **Server Components** using `process.env.BESTBUY_API_KEY` only.
+# Glantra: E-commerce (Next.js) - Build & handoff spec
+
+This document describes **the app as built** in this repository: a **Glantra**-branded storefront (you can rebrand and swap product verticals by following the “Changing products / vertical” section). It is meant to be **shared with another project or team** to reproduce or extend the same architecture.
+
+> **Not used in this app:** the original “TechVault + Best Buy API” spec. Catalog data here comes from **DummyJSON** (`https://dummyjson.com`). The folder path `app/api/bestbuy/` is a **legacy name**; handlers call DummyJSON, not Best Buy.
+
 ---
-## 1. Tech Stack & Folder Structure
-techVault/ ├── app/ │ ├── layout.tsx │ ├── page.tsx # Landing (Home) │ ├── products/ │ │ ├── page.tsx # Listing (search + category filters; server or client per implementation) │ │ └── [sku]/ │ │ └── page.tsx # Product detail by SKU │ ├── affiliate/ │ │ └── page.tsx │ ├── partner/ # optional: rename from "vendor" — e.g. marketplace partners │ │ └── page.tsx │ ├── about/ │ │ └── page.tsx │ ├── contact/ │ │ └── page.tsx │ ├── cart/ │ │ └── page.tsx │ ├── login/ │ │ └── page.tsx │ ├── register/ │ │ └── page.tsx │ └── api/ │ ├── bestbuy/ │ │ ├── products/ │ │ │ └── route.ts # GET proxy: search / list (query params → Best Buy) │ │ └── product/ │ │ └── [sku]/ │ │ └── route.ts # GET single product by SKU │ ├── auth/ │ │ ├── register/route.ts │ │ ├── login/route.ts │ │ └── logout/route.ts │ └── user/ │ └── me/route.ts ├── components/ │ ├── Navbar.tsx │ ├── Footer.tsx │ ├── ProductCard.tsx # props: Best Buy product shape (subset) │ ├── CartIcon.tsx │ ├── AffiliateCard.tsx │ └── PaymentModal.tsx ├── context/ │ ├── CartContext.tsx │ └── AuthContext.tsx ├── data/ │ └── users.json ├── lib/ │ ├── auth.ts │ └── bestbuy.ts # fetch helpers, URL building, format=json, pagination helpers └── public/
 
-**Dependencies to install:**
+## 1. One-page summary
+
+| Area | What we use |
+|------|-------------|
+| **Framework** | **Next.js 16** (App Router), **React 18**, **TypeScript** |
+| **Styling** | **Tailwind CSS 3** - slate/cyan/amber, optional **brand** green tokens, Google fonts (Sora, DM Sans, JetBrains Mono) |
+| **Catalog** | **DummyJSON Products API** (public, no key). Server-side fetches + Next `revalidate` caching |
+| **Auth** | Email/password, **bcrypt** hashes, users in **`src/data/users.json`**, **HTTP-only** signed session cookie `techvault_session` (HMAC, `SESSION_SECRET`) |
+| **Cart** | **React Context** + **localStorage** persistence |
+| **Checkout** | **Sign-in required** (server + client gate). No guest checkout. Profile PATCH, then **simulated payment** modal (always fails with friendly message, cart kept) |
+| **Partner** | **Sign-in required** (server layout redirect). Shown in nav/footer only when logged in |
+| **“Chat with us”** | **Guests:** toast + redirect to login. **Signed-in:** opens **AI product assistant** (OpenAI) + link to **Contact**; floating panel **ChatWidgetProvider** |
+| **AI assistant** | `POST /api/ai/chat` - OpenAI chat completions, catalog context from DummyJSON, **auth required** |
+| **Policies** | Markdown in **`src/content/legal/`**, rendered via `MarkdownArticle` / legal pages |
+
+**Node:** `>=20.9.0` (see `package.json` `engines`).
+
+---
+
+## 2. Product philosophy (this build)
+
+- **Laptops** and **tablets** (and related accessories) as the public story; **phones/smartphones** were **removed** as a product category in UI and in `categories.ts`.
+- **USD** display via `Intl` / `formatUsd` in `src/lib/pricing.ts` - not repeated in marketing copy as “US dollars (USD)”.
+- **No em dashes (—)** in user-facing copy (policy of this project); use periods, commas, or **·** where needed.
+- **Newsletter** exists as a **home page section** (`Newsletter` component) - not in the **footer** (footer has **Policies** column: privacy + returns).
+
+---
+
+## 3. Environment variables
+
+Copy **`.env.local.example`** to **`.env.local`** and set:
+
+| Variable | Purpose |
+|----------|---------|
+| `SESSION_SECRET` | Long random string for HMAC session tokens (required in production) |
+| `NEXT_PUBLIC_SITE_NAME` | Default site name, e.g. `Glantra` (`src/lib/site.ts`) |
+| `NEXT_PUBLIC_SITE_DOMAIN` | Domain string in copy, e.g. `glantrastore.com` |
+| `NEXT_PUBLIC_SITE_URL` | Used for `metadataBase` in `app/layout.tsx` |
+| `NEXT_PUBLIC_CURRENCY` | Documented; pricing code uses `formatUsd` / USD |
+| `OPENAI_API_KEY` | **Required** for AI chat to work; without it, `/api/ai/chat` returns 503 |
+| `OPENAI_MODEL` | Optional; default **`gpt-4o-mini`** in `app/api/ai/chat/route.ts` |
+
+**No API key** is required for DummyJSON (public).
+
+---
+
+## 4. Install & scripts
+
 ```bash
-npx create-next-app@latest techVault --typescript --tailwind --eslint --app --src-dir=false --import-alias="@/*"
-cd techVault
-npm install js-cookie @types/js-cookie bcryptjs @types/bcryptjs
-# optional: npm install bestbuy
-2. Design System
-Reuse the "Midnight Gold" palette from the reference project for visual consistency, or rename tokens if you prefer a cooler "tech" accent (cyan on navy). At minimum, keep:
+npm install
+# or: yarn / pnpm
 
-Dark background, card surfaces, gold/cyan accent, readable body text
-Display font + UI sans + mono for prices
-Apply tokens in tailwind.config.ts and app/globals.css analogous to the BookStem instructions.
+npm run dev     # next dev
+npm run build   # next build
+npm run start   # next start
+npm run lint    # tsc --noEmit (TypeScript as lint)
+```
 
-3. Data Layer — Best Buy (Server-Side)
-lib/bestbuy.ts — responsibilities
-Base: https://api.bestbuy.com/v1/
-Append apiKey from process.env.BESTBUY_API_KEY
-Always request JSON, e.g. &format=json (or per Best Buy docs — ensure responses are JSON, not XML)
-Helpers:
-searchProducts({ query, page, pageSize, categoryPathName? }) — respect max pageSize 100
-getProductBySku(sku: string)
-Normalize API errors: surface friendly messages for 404 / rate limits / invalid key
-Example API patterns (illustrative — verify against current Best Buy docs)
-Text search: products endpoint with (search=...) style filter
-Category browsing: filter on category path / slug fields as documented
-Single SKU: fetch by sku in the path or filter
-Typing: Define a BestBuyProduct TypeScript interface for the fields you actually use (e.g. sku, name, regularPrice, salePrice, image, largeFront, customerReviewAverage, customerReviewCount, longDescription / description, manufacturer, categoryPath).
+---
 
-Client-facing data flow
-Listing page and detail page should consume /api/bestbuy/... routes, not call Best Buy directly from the browser.
-4. Authentication — Server-Side (No DB)
-Same as reference build:
+## 5. Dependencies (runtime, notable)
 
-data/users.json starts as []
-lib/auth.ts with bcryptjs, readUsers / writeUsers / createUser / verifyUser / getUserById
-User fields: include plan: 'free' | 'starter' | 'pro' for affiliate-style upsell
-Cookie name: use techvault_session (or similar) instead of bookstem_session.
+- **next**, **react**, **react-dom**
+- **@hookform/resolvers**, **react-hook-form**, **yup** - forms (checkout, contact, auth)
+- **bcryptjs** - password hashing
+- **framer-motion** - e.g. `AnimatedSection`, home motion
+- **react-hot-toast** - toasts
+- **react-markdown** - legal pages + AI assistant replies in `AIChatPanel`
 
-API routes
-Mirror the BookStem auth routes (register, login, logout, me) with the new cookie name and site branding.
+---
 
-5. Context Providers
-context/AuthContext.tsx
-Same structure as reference; point fetches to /api/auth/* and /api/user/me.
+## 6. High-level folder structure
 
-context/CartContext.tsx
-Cart items should store a minimal snapshot of each product so the cart works offline from further API calls:
-sku, name, unitPrice (the price used when added — base or member), imageUrl, optional slugPath if any
-Keys: use sku instead of book slug
-Persist to localStorage key e.g. techvault_cart
-totalPrice should sum stored unitPrice * qty
-6. Root Layout
-Wrap with AuthProvider → CartProvider
-Navbar + Footer
-Metadata title/description for TechVault / computers & accessories
-Google Fonts same pattern as reference
-7. Navbar Component
-Brand: TechVault (text logo: e.g. Tech accent + Vault white)
-Links: Home, Products, Affiliate, Partner (or Vendor), About, Contact
-Cart with badge → /cart
-Auth buttons / user greeting — same behavior as reference
-8. Home / Landing Page
-Adapt the BookStem homepage sections for tech:
+```
+src/
+├── app/
+│   ├── layout.tsx              # Root: fonts, AuthProvider, ChatWidgetProvider, CartProvider, Navbar, main, Footer, AIChatPanel, ChatUsButton, HotToaster
+│   ├── globals.css
+│   ├── page.tsx                # Home: HeroCarousel, categories, featured, shipping strip, Newsletter
+│   ├── products/
+│   │   ├── page.tsx            # Server shell + ProductsClient (search, category, pagination)
+│   │   └── [sku]/page.tsx     # Product detail
+│   ├── cart/page.tsx
+│   ├── checkout/
+│   │   ├── layout.tsx         # Server: must be logged in (redirect to /login?next=/checkout)
+│   │   └── page.tsx            # Client: shipping form, profile PATCH, PaymentModal
+│   ├── login/, register/
+│   ├── dashboard/             # Account + “Chat with us” card (contact + “Open product assistant”)
+│   ├── partner/               # layout.tsx: auth gate → /login?next=/partner
+│   │   └── PartnerForm.tsx
+│   ├── about/, contact/
+│   ├── privacy/, returns/     # Legal markdown
+│   ├── not-found.tsx
+│   └── api/
+│       ├── bestbuy/
+│       │   ├── products/route.ts    # GET → fetchDummyJsonProducts
+│       │   └── product/[sku]/route.ts
+│       ├── auth/ login, register, logout
+│       ├── user/ me, profile
+│       └── ai/chat/route.ts         # OpenAI, optional catalog context
+├── components/                # Navbar, Footer, ProductCard, CartView, AIChatPanel, ChatUsButton, etc.
+├── context/                   # AuthContext, CartContext, ChatWidgetContext
+├── data/users.json
+├── content/legal/             # privacy-policy.md, return-policy.md
+├── lib/
+│   ├── site.ts
+│   ├── contact-info.ts
+│   ├── categories.ts          # Slugs ↔ DummyJSON category slugs
+│   ├── dummyjson.ts           # All DummyJSON access + map to StoreProduct
+│   ├── store-types.ts
+│   ├── pricing.ts
+│   ├── auth.ts, session.ts, server-auth.ts
+│   └── ai/build-product-context.ts
+└── types/user.ts
+```
 
-Hero: headline about upgrading your setup / workspace; CTAs: Browse Deals / Become an Affiliate
-Featured products: call internal API for a curated query (e.g. top-rated laptops or "on sale") — show 4–8 ProductCards
-Why TechVault: fast shipping story (simulated), member savings, affiliate earnings
-Affiliate plans: keep two-tier pricing but frame as tech audience (USD or your chosen display)
-Teaser: e.g. "Warranty & Support" or "Build Your PC" cards linking to /products with a query
-Testimonials
-Newsletter strip (client-only success toast)
-9. Products Page
-app/products/page.tsx
-Data: Fetch via /api/bestbuy/products?... with:
-Search box (debounced) → passes q to API route
-Category chips: map to Best Buy category filters you document (e.g. Laptops, Desktops, Monitors, Accessories)
-Pagination: "Load more" or numbered pages — remember max 100 per request
-Sort: implement using API-supported fields where possible; otherwise sort client-side on the current page only and document the limitation
-Cards: ProductCard shows image, name, manufacturer, review stars, sale vs regular price
-Member price: if logged in, show discounted price vs strikethrough API price
-Empty / error states: user-friendly messages when API fails or returns zero results.
+`next.config.mjs` - **`images.remotePatterns`** for DummyJSON CDNs and `placehold.co`.
 
-10. Product Detail Page
-app/products/[sku]/page.tsx
-Server-fetch product by SKU via lib/bestbuy or internal API route
-Layout: large image gallery (primary image + thumbnails if available), title, manufacturer, SKU, ratings, price block with member logic
-Description: render API description HTML safely (use allowed tags only or strip HTML per your policy)
-Add to cart: uses CartContext; store snapshot with the price shown at add time
-Related products: second API call, e.g. same categoryPath or search by manufacturer — horizontal scroll
-11. Cart / Checkout Page
-Same UX as reference:
+---
 
-Line items with thumb, name, price, qty stepper, remove
-Subtotal, shipping line (e.g. TBD or flat $9.99 simulated), total
-Checkout form: name, email, phone, address fields
-PaymentModal: 5s spinner → error → Try Again / Return Home; cart not cleared
-12. ProductCard Component
-Props: product: BestBuyProduct (subset), showMemberPrice?: boolean
+## 7. Catalog: DummyJSON (not Best Buy)
 
-Image from API CDN
-Badges: e.g. "On Sale" if salePrice < regularPrice
-Reviews: customerReviewAverage + count
-Price row: regular strikethrough when on sale
-Add to cart button with brief "Added" state
-13. Affiliate Page
-Reframe copy for tech creators / deal channels; same structure: hero, how it works, plans, FAQ, CTAs to /register.
+- **Base:** `https://dummyjson.com` (see [DummyJSON products docs](https://dummyjson.com/docs/products)).
+- **Normalized type:** `StoreProduct` in `src/lib/store-types.ts` (sku, name, sale/regular price, image, description, categoryPath, reviews, etc.).
+- **Mapping:** `src/lib/dummyjson.ts` - `mapDummy` maps API JSON to `StoreProduct`; `fetchDummyJsonProducts` supports pagination, `categorySlug`, search `q`, and merge across categories.
+- **HTTP routes (legacy name `bestbuy`):**
+  - **`GET /api/bestbuy/products`** - query: `page`, `pageSize`, `q`, `category` (must match a slug in `src/lib/categories.ts`).
+  - **`GET /api/bestbuy/product/[sku]`** - single product by id.
 
-14. Partner / Vendor Page
-Rename to Authorized Partners or Sell on TechVault — form collects company + contact + categories; success message only (no backend).
+**Why “bestbuy” in the path?** Historical; implementation is 100% DummyJSON. You may rename the route folder to e.g. `api/store/products` in a fork (update fetches in `ProductsClient` and any server fetches).
 
-15–18. About, Contact, Login, Register
-Same patterns as BookStem; update copy and any locale/contact details. Successful login/register redirect to /products.
+---
 
-19. Footer Component
-4-column footer: brand, quick links, programs, newsletter. © year TechVault.
+## 8. Categories - how they work and how to change the product vertical
 
-20. PaymentModal Component
-Identical behavior to reference; currency display USD.
+**File:** `src/lib/categories.ts`
 
-21. Global CSS
-Reuse BookStem global CSS (shimmer, spinner, scrollbar, focus rings) with TechVault branding tweaks if desired.
+- Defines **`ProductCategorySlug`** (a union of string literals, e.g. `'laptops-computers' | 'accessories'`).
+- Each entry has: **`slug`** (URL/query param), **`label`**, **`description`**, **`dummyjsonCategorySlug`**.
 
-22. Environment & Configuration
-.env.local (do not commit)
-BESTBUY_API_KEY=your_key_here
-NEXT_PUBLIC_SITE_NAME=TechVault
-NEXT_PUBLIC_CURRENCY=USD
-next.config.js
-Add images.remotePatterns for Best Buy image hostnames you observe in API responses (e.g. pisces.bbystatic.com — confirm live hostnames in your responses).
+`dummyjsonCategorySlug` must be a **valid DummyJSON product category** string (e.g. `laptops`, `tablets`, `smartphones`, `groceries`, `home-decoration`, etc. - see DummyJSON for the full list).
 
-23. Execution Order for Cursor Agent
-Scaffold Next.js app + dependencies
-Design system (Tailwind + fonts + globals)
-lib/bestbuy.ts + app/api/bestbuy/* proxies
-data/users.json + lib/auth.ts + auth API routes
-Contexts (Auth, Cart with SKU-based items)
-Root layout, Navbar, Footer
-Home (featured from API)
-Products listing (search, filters, pagination)
-Product detail [sku]
-Cart + PaymentModal
-Affiliate + Partner + About + Contact
-Login + Register
-QA: env key only on server, images load, cart persistence, auth, modal timing
-24. Quality Checklist
+**To sell a different kind of product (not electronics):**
 
- Best Buy API key is only used server-side
+1. **Pick** DummyJSON categories that match your vertical (e.g. `skincare`, `home-decoration`, `groceries`).
+2. **Edit** `PRODUCT_CATEGORIES` in `categories.ts` - set `slug`/`label`/`description` for your UX and set **`dummyjsonCategorySlug`** to the DummyJSON category name.
+3. **Update** `ProductCategorySlug` TypeScript union to match your new slugs.
+4. **Search and replace** across the repo for old slugs in links (e.g. `products/page.tsx` `SLUGS`, `page.tsx` home “Shop by category” and hero links, `src/lib/ai/build-product-context.ts` intro text, marketing copy on `page.tsx` / `about` / `layout` metadata).
+5. **Home / featured** fetches in `app/page.tsx` use `getCategoryBySlug('laptops-computers')` and `accessories` - align those with your new slugs.
+6. **AI** system prompt in `app/api/ai/chat/route.ts` and **text** in `lib/ai/build-product-context.ts` still mention “laptops/tablets” until you reword for your store.
 
- JSON responses verified (not XML)
+**`src/lib/dummyjson.ts`** also filters the **all-products merge** to only `PRODUCT_CATEGORIES`’ `dummyjsonCategorySlug` values when no search query is applied - so your category list is the allowlist for the default catalog.
 
- Pagination respects page size ≤ 100
+---
 
- Product detail works for arbitrary valid SKU
+## 9. Auth & sessions
 
- Cart persists in localStorage; survives refresh
+- **Storage:** `src/data/users.json` (array of `UserRecord` - `src/types/user.ts`). No database.
+- **Register / login** - `src/app/api/auth/register/route.ts`, `login/route.ts`; cookie **`techvault_session`**, `httpOnly`, `sameSite: lax`, `path: /`.
+- **Session format:** HMAC signed payload in `src/lib/session.ts` (`createSessionToken` / `parseSessionToken`); `SESSION_SECRET` must not be the default in production.
+- **Client** - `AuthContext` fetches `GET /api/user/me` with credentials; exposes `user`, `loading`, `setUser`, `refresh`.
+- **Server** - `src/lib/server-auth.ts` - `getServerUser()` for layouts (partner, checkout).
 
- Cart survives payment failure flow
+**Public user shape:** `PublicUser` = user without `passwordHash`.
 
- Logged-in users see member pricing where implemented
+**Profile** - `PATCH /api/user/profile` (name + profile: phone, address fields); used at checkout to save shipping.
 
- next/image allows Best Buy CDN domains
+---
 
- Mobile nav works
+## 10. Route protection (login required)
 
- npm run build passes
+| Feature | Mechanism |
+|---------|-----------|
+| **Checkout** | `app/checkout/layout.tsx` - `getServerUser()`; if missing, `redirect('/login?next=/checkout')`. Client page also syncs. |
+| **Cart → Checkout** | `CartView` - if not `user`, button is **“Log in to checkout”** → `/login?next=/checkout`. |
+| **Partner** | `app/partner/layout.tsx` - redirect to login with `next=/partner`. Navbar/footer **Partner** only if `user`. |
+| **AI chat** | `POST /api/ai/chat` - 401 if no valid session. Floating `ChatUsButton` for guests: toast + login with `next` = current path. |
+| **Dashboard** | Client redirect to login if not authenticated. |
+
+**Login** - `LoginForm` respects `?next=` for return URL after sign-in (must be path starting with `/`).
+
+---
+
+## 11. Cart & pricing
+
+- **`CartContext`** - lines with sku, name, price snapshot, image, quantity; `localStorage` key for persistence.
+- **Unit price** - `getUnitPrice` + **`formatUsd`** in `src/lib/pricing.ts` (USD `Intl` formatting).
+- **Shipping** - flat constant in `CartView` / checkout (e.g. 9.99) - adjust in code as needed.
+- **Payment** - `components/PaymentModal.tsx`: short fake “loading” then error toast; **no real charge**; in error state, **Back to products** calls `router.push('/products')` and closes the modal. **Cancel** closes without navigation.
+
+---
+
+## 12. Key pages (behavior)
+
+- **/** - Server-rendered; fetches featured + tablet spot from DummyJSON; `HeroCarousel` slides; `Newsletter` strip at bottom.
+- **/products** - `ProductsClient` fetches `/api/bestbuy/products` with debounced search and category chips.
+- **/products/[sku]** - Server component + `AddToCartButton`, `ProductCard` patterns.
+- **/cart** - `CartView`.
+- **/checkout** - Logged in only; form → `PATCH` profile → `PaymentModal`.
+- **/contact** - Contact form, optional fields, toast.
+- **/dashboard** - Profile summary, shopping links, “Chat with us” card (call, contact, open AI assistant).
+- **/partner** - “Partner with us” form (interest capture + toast) - **auth only** at layout level.
+- **/privacy**, **/returns** - `LegalPageShell` + markdown from `content/legal/`.
+- **/login**, **/register** - `LoginForm`, `RegisterForm` with yup.
+
+---
+
+## 13. UI / design
+
+- **Fonts:** `layout.tsx` - Sora (display), DM Sans, JetBrains Mono (CSS variables `--font-sora`, etc.).
+- **Components:** `PageHeader` (breadcrumbs, title, description), `GlantraLogo`, `ProductCard`, `HeroCarousel` (home), `CartIcon` in `Navbar`, `HotToaster` (react-hot-toast), `Footer` (4 columns: brand, Shop, Company, **Policies**).
+- **Floating UI:** `ChatUsButton` (z-index ~60), `AIChatPanel` (~70) when open, above main content.
+- **Tailwind** - `tailwind.config.ts`: brand green palette, cyan, `font-display` / `font-sans` / `font-mono` mapped to CSS variables.
+
+---
+
+## 14. AI product assistant
+
+- **Files:** `src/components/AIChatPanel.tsx`, `src/context/ChatWidgetContext.tsx`, `src/app/api/ai/chat/route.ts`, `src/lib/ai/build-product-context.ts`.
+- **Flow:** Logged-in user toggles “Chat with us” → panel opens. Messages posted to **OpenAI** with a **system prompt** + **catalog text** built from `buildProductContextForAI()` (samples per category in `categories.ts`).
+- **Requires** `OPENAI_API_KEY` (503 with JSON error if missing).
+- Assistant messages rendered with **react-markdown**; user can link to **/contact** from panel header.
+
+---
+
+## 15. Contact & brand constants
+
+**`src/lib/contact-info.ts`** - address, phone, payments email, site URL. Update for your deployment and keep legal markdown in sync if needed.
+
+---
+
+## 16. Legal content
+
+- **`src/content/legal/privacy-policy.md`**
+- **`src/content/legal/return-policy.md`**
+
+Routes **/privacy** and **/returns** load these. Edit markdown for the new brand/store.
+
+---
+
+## 17. `next.config.mjs` (images)
+
+Allow remote images for:
+
+- `cdn.dummyjson.com`, `i.dummyjson.com`, `placehold.co`
+
+Add hosts here if you switch CDN or add more image domains.
+
+---
+
+## 18. Rebranding / fork checklist (quick)
+
+- [ ] `NEXT_PUBLIC_*` in `.env.local` and `package.json` name
+- [ ] `site.ts`, `contact-info.ts`, `layout.tsx` metadata, logo component / wordmark
+- [ ] `categories.ts` + home/products copy + `build-product-context` + AI route intro text
+- [ ] `content/legal/*.md` and any footer/header strings
+- [ ] `data/users.json` (seed or empty for new env)
+- [ ] Rename `api/bestbuy` → clearer name and update fetches
+- [ ] `SESSION_SECRET` and `OPENAI_API_KEY` in production
+
+---
+
+## 19. Known limitations / intent
+
+- **No real payment** - demo UX only.
+- **Single-user JSON file** - not suitable for high concurrency; replace with a DB in production if needed.
+- **DummyJSON** is demo data - not your real catalog unless you replace the data layer.
+- **Route name `bestbuy`** - misleading; safe to rename in a clean fork.
+
+This file should be enough to **rebuild the same architecture** in a clean repo: swap **DummyJSON categories** and **branding** to match any vertical the DummyJSON API supports, then adjust copy and env vars.
