@@ -9,7 +9,7 @@ import { ChatWidgetProvider } from '@/context/ChatWidgetContext'
 import { CartProvider } from '@/context/CartContext'
 import { Footer } from '@/components/Footer'
 import { Navbar } from '@/components/Navbar'
-import { siteName } from '@/lib/site'
+import { siteName, siteTagline } from '@/lib/site'
 
 import './globals.css'
 
@@ -36,11 +36,10 @@ const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 export const metadata: Metadata = {
   metadataBase: new URL(base),
   title: {
-    default: `${siteName()} · Glantra Store`,
+    default: `${siteName()} · General merchandise & computers`,
     template: `%s | ${siteName()}`,
   },
-  description:
-    'Glantra Store is your one-stop-shop for your global computing needs.',
+  description: siteTagline(),
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

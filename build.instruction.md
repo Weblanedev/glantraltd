@@ -43,7 +43,9 @@ Copy **`.env.local.example`** to **`.env.local`** and set:
 | `SESSION_SECRET` | Long random string for HMAC session tokens (required in production) |
 | `NEXT_PUBLIC_SITE_NAME` | Default site name, e.g. `Glantra` (`src/lib/site.ts`) |
 | `NEXT_PUBLIC_SITE_DOMAIN` | Domain string in copy, e.g. `glantrastore.com` |
-| `NEXT_PUBLIC_SITE_URL` | Used for `metadataBase` in `app/layout.tsx` |
+| `NEXT_PUBLIC_SITE_URL` | Used for `metadataBase` in `app/layout.tsx` (e.g. `https://glantrastore.com`) |
+| `NEXT_PUBLIC_LEGAL_NAME` | Optional, default `Glantra Limited` |
+| `NEXT_PUBLIC_TAGLINE` | Optional, e.g. general merchandise and computers line |
 | `NEXT_PUBLIC_CURRENCY` | Documented; pricing code uses `formatUsd` / USD |
 | `OPENAI_API_KEY` | **Required** for AI chat to work; without it, `/api/ai/chat` returns 503 |
 | `OPENAI_MODEL` | Optional; default **`gpt-4o-mini`** in `app/api/ai/chat/route.ts` |

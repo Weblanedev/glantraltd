@@ -1,6 +1,6 @@
 **Last updated:** April 2026
 
-This Return & Refund Policy applies to purchases made through **Glantra** at **glantrastore.com** (the “Site”), unless a product page or order states different terms.
+This Return & Refund Policy applies to purchases made through **Glantra Limited** (trading as **Glantra**) at **glantrastore.com** (the “Site”), unless a product page or order states different terms.
 
 ## 1. Eligibility
 
@@ -45,8 +45,8 @@ If you receive a **defective** or **incorrect** item, contact us within **48 hou
 
 ## 8. Contact
 
-**Glantra**  
-112, Lagos Island, Lagos, Nigeria  
+**Glantra Limited**  
+22 Munisat Aleje Street, Ikorodu, Lagos State, Nigeria  
 
 Email: **payments@glantrastore.com**  
 Phone: **09088199087**

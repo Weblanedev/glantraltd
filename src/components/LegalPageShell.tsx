@@ -1,6 +1,6 @@
 import { PageHeader } from '@/components/PageHeader'
 import { MarkdownArticle } from '@/components/MarkdownArticle'
-import { siteName } from '@/lib/site'
+import { siteDomain, siteName } from '@/lib/site'
 import type { ReactNode } from 'react'
 
 type Props = {
@@ -20,6 +20,7 @@ export function LegalPageShell({
   children,
 }: Props) {
   const n = siteName()
+  const domain = siteDomain()
   return (
     <div className="mx-auto max-w-3xl">
       <PageHeader
@@ -32,7 +33,7 @@ export function LegalPageShell({
       />
       <div className="mt-2 rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm sm:p-10">
         <p className="text-sm text-slate-500">
-          {n} · glantrastore.com
+          {n} · {domain}
         </p>
         <div className="mt-6">
           <MarkdownArticle content={content} />

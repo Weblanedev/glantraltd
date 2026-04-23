@@ -6,7 +6,7 @@ import { LegalPageShell } from '@/components/LegalPageShell'
 export const metadata = {
   title: 'Privacy Policy',
   description:
-    'How Glantra collects, uses, and protects your information on glantrastore.com.',
+    'How Glantra Limited collects, uses, and protects your information on glantrastore.com.',
 }
 
 export default async function PrivacyPolicyPage() {
@@ -17,7 +17,7 @@ export default async function PrivacyPolicyPage() {
   return (
     <LegalPageShell
       title="Privacy policy"
-      description="How we handle personal data when you use Glantra and glantrastore.com."
+      description="How we handle personal data when you use glantrastore.com."
       breadcrumbLabel="Privacy"
       content={content}
     />

@@ -1,6 +1,6 @@
 **Last updated:** April 2026
 
-**Glantra** (“we”, “us”, “our”) operates the website and services at **glantrastore.com** (the “Site”). This Privacy Policy describes how we collect, use, disclose, and safeguard your information when you visit the Site or make a purchase.
+**Glantra Limited** (“we”, “us”, “our”) operates the website and services at **glantrastore.com** (the “Site”). This Privacy Policy describes how we collect, use, disclose, and safeguard your information when you visit the Site or make a purchase. General merchandise and sales of computers.
 
 ## 1. Information we collect
 
@@ -68,8 +68,8 @@ We may update this Privacy Policy from time to time. The “Last updated” date
 
 ## 11. Contact
 
-**Glantra**  
-112, Lagos Island, Lagos, Nigeria  
+**Glantra Limited**  
+22 Munisat Aleje Street, Ikorodu, Lagos State, Nigeria  
 
 Email: **payments@glantrastore.com**  
 Phone: **09088199087**

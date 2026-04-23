@@ -1,13 +1,18 @@
 import Link from 'next/link'
 
 import { PageHeader } from '@/components/PageHeader'
-import { GLANTRA_ADDRESS, GLANTRA_PHONE, GLANTRA_EMAIL_PAYMENTS } from '@/lib/contact-info'
-import { siteName } from '@/lib/site'
+import {
+  GLANTRA_ADDRESS,
+  GLANTRA_EMAIL_PAYMENTS,
+  GLANTRA_LEGAL_NAME,
+  GLANTRA_PHONE,
+} from '@/lib/contact-info'
+import { siteDomain, siteName, siteTagline } from '@/lib/site'
 
 export const metadata = {
   title: 'About us',
   description:
-    'Glantra. Electronics and lifestyle e-commerce with a clear shopping experience, rooted in Lagos.',
+    'Glantra Limited: general merchandise and sales of computers. Based in Ikorodu, Lagos, Nigeria.',
 }
 
 export default function AboutPage() {
@@ -16,7 +21,7 @@ export default function AboutPage() {
     <div>
       <PageHeader
         title="About Glantra"
-        description="We build a modern shopping experience for electronics and everyday tech, with transparent pricing, a smooth cart, and support you can reach."
+        description="General merchandise and sales of computers, with a clear online store, cart, and support you can reach."
         breadcrumbs={[
           { label: 'Home', href: '/' },
           { label: 'About' },
@@ -30,14 +35,17 @@ export default function AboutPage() {
               Who we are
             </h2>
             <p className="mt-4 leading-relaxed text-slate-600">
-              <strong className="text-slate-800">{n}</strong> is the retail brand behind{' '}
-              <strong>glantrastore.com</strong>, an e-commerce destination for laptops,
-              tablets, and accessories. We source product data and imagery
-              from trusted feeds so you can compare devices, read clear descriptions, and
-              use a cart that follows you across the site.
+              <strong className="text-slate-800">{GLANTRA_LEGAL_NAME}</strong> (
+              {siteTagline()}) trades under the name <strong className="text-slate-800">
+                {n}
+              </strong>
+              . Our online store at <strong>{siteDomain()}</strong> is built for laptops,
+              tablets, and related products. We source product data and imagery from
+              trusted feeds so you can compare devices, read clear descriptions, and use a
+              cart that follows you across the site.
             </p>
             <p className="mt-4 leading-relaxed text-slate-600">
-              Our team is based in <strong className="text-slate-800">Lagos, Nigeria</strong>
+              We are based at <strong className="text-slate-800">Ikorodu, Lagos State</strong>
               . We&rsquo;re focused on making discovery simple: search and category filters,
               product detail pages with ratings, and a checkout you complete while signed
               in, with saved shipping details on your account.

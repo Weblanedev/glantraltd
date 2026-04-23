@@ -6,7 +6,7 @@ import { LegalPageShell } from '@/components/LegalPageShell'
 export const metadata = {
   title: 'Return policy',
   description:
-    'Glantra return windows, eligibility, and how to request a refund or exchange.',
+    'Glantra Limited return windows, eligibility, and how to request a refund or exchange.',
 }
 
 export default async function ReturnPolicyPage() {

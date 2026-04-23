@@ -4,11 +4,13 @@ import Link from 'next/link'
 
 import { GlantraLogo } from '@/components/GlantraLogo'
 import { useAuth } from '@/context/AuthContext'
-import { siteName } from '@/lib/site'
+import { siteDomain, siteLegalName, siteName, siteTagline } from '@/lib/site'
 
 export function Footer() {
   const y = new Date().getFullYear()
   const name = siteName()
+  const legal = siteLegalName()
+  const domain = siteDomain()
   const { user } = useAuth()
   return (
     <footer className="mt-24 border-t border-slate-200 bg-slate-200/50">
@@ -16,7 +18,7 @@ export function Footer() {
         <div>
           <GlantraLogo size="sm" showWordmark wordmarkClassName="!text-slate-900" />
           <p className="mt-2 text-sm leading-relaxed text-slate-600">
-            Electronics e-commerce. Browse, compare, and check out.
+            {siteTagline()} Browse, compare, and check out.
           </p>
         </div>
         <div>
@@ -102,7 +104,8 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-slate-200/80 py-4 text-center text-xs text-slate-500">
-        © {y} {name} · <span className="text-slate-400">glantrastore.com</span>
+        © {y} {legal}. <span className="text-slate-400">{name}</span> ·{' '}
+        <span className="text-slate-400">{domain}</span>
       </div>
     </footer>
   )
