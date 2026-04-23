@@ -1,0 +1,23 @@
+[
+  {
+    "id": "b756d91d-0d76-470c-ba4f-1b9545fc2ce7",
+    "email": "m1@g.com",
+    "name": "john doe",
+    "plan": "free",
+    "passwordHash": "$2a$10$Lk9xp/CWvGhfQSAfGPo5tOk2Vi6bdcP20zhbgHnoXmVbNw20RHcnO",
+    "profile": {
+      "phone": "0988779900",
+      "address1": "2 ave",
+      "city": "magodo",
+      "state": "lag",
+      "zip": "10003"
+    }
+  },
+  {
+    "id": "d74d05c7-391c-4a55-85c4-5fcd341a2303",
+    "email": "m@gmail.com",
+    "name": "MAYOWA KAYODE",
+    "plan": "free",
+    "passwordHash": "$2a$10$Sw.i0/991NOf3v21Xwe3nuRkh55kSbGzVwfvCaRHokyug0wz9v7Iy"
+  }
+]
