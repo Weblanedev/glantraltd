@@ -36,11 +36,11 @@ const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 export const metadata: Metadata = {
   metadataBase: new URL(base),
   title: {
-    default: `${siteName()} · Electronics & e-commerce`,
+    default: `${siteName()} · Glantra Store`,
     template: `%s | ${siteName()}`,
   },
   description:
-    'Glantra (glantrastore.com). Shop laptops and tablets, with cart and secure checkout.',
+    'Glantra Store is your one-stop-shop for your global computing needs.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
