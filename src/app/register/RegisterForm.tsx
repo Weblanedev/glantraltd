@@ -70,7 +70,7 @@ export function RegisterForm() {
           </label>
           <input
             id="name"
-            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800"
+            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800"
             autoComplete="name"
             {...register('name')}
           />
@@ -85,7 +85,7 @@ export function RegisterForm() {
           <input
             id="email"
             type="email"
-            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800"
+            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800"
             autoComplete="email"
             {...register('email')}
           />
@@ -103,7 +103,7 @@ export function RegisterForm() {
           <input
             id="password"
             type="password"
-            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800"
+            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800"
             autoComplete="new-password"
             {...register('password')}
           />

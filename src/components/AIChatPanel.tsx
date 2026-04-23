@@ -143,7 +143,7 @@ export function AIChatPanel() {
           >
             <div className="flex gap-2">
               <input
-                className="min-w-0 flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+                className="min-w-0 flex-1 rounded-xl border border-slate-200 px-3 py-2 text-base text-slate-900 shadow-sm focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
                 placeholder="Ask about products…"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}

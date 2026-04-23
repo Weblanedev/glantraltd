@@ -67,7 +67,7 @@ export function CartView() {
                   min={1}
                   value={line.qty}
                   onChange={(e) => setQty(line.sku, Number(e.target.value) || 1)}
-                  className="w-16 rounded border border-slate-200 bg-white px-2 py-1 text-sm"
+                  className="w-16 rounded border border-slate-200 bg-white px-2 py-1 text-base"
                 />
                 <button
                   type="button"
@@ -78,7 +78,7 @@ export function CartView() {
                 </button>
               </div>
             </div>
-            <p className="font-mono text-slate-800">
+            <p className="shrink-0 font-mono text-slate-800">
               {formatUsd(line.unitPrice * line.qty)}
             </p>
           </div>

@@ -41,7 +41,7 @@ export function PartnerForm() {
               id="company"
               name="company"
               required
-              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm"
+              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800"
             />
           </div>
           <div>
@@ -56,7 +56,7 @@ export function PartnerForm() {
               name="contact"
               type="email"
               required
-              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm"
+              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800"
             />
           </div>
           <div>
@@ -72,7 +72,7 @@ export function PartnerForm() {
               required
               rows={3}
               placeholder="Laptops, tablets, accessories…"
-              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm"
+              className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800"
             />
           </div>
           <button

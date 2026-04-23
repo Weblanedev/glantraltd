@@ -74,7 +74,7 @@ export function LoginForm() {
             id="email"
             type="email"
             autoComplete="email"
-            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800"
+            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800"
             {...register('email')}
           />
           {errors.email && (
@@ -92,7 +92,7 @@ export function LoginForm() {
             id="password"
             type="password"
             autoComplete="current-password"
-            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800"
+            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800"
             {...register('password')}
           />
           {errors.password && (

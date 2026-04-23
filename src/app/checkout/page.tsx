@@ -184,7 +184,7 @@ export default function CheckoutPage() {
               </label>
               <input
                 id={f}
-                className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 shadow-sm read-only:bg-slate-50"
+                className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800 shadow-sm read-only:bg-slate-50"
                 readOnly={f === 'email'}
                 autoComplete={f === 'email' ? 'email' : f === 'fullName' ? 'name' : 'tel'}
                 {...register(f)}
@@ -204,7 +204,7 @@ export default function CheckoutPage() {
               </label>
               <input
                 id={f}
-                className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 shadow-sm"
+                className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800 shadow-sm"
                 autoComplete={
                   f === 'address1' ? 'street-address' : f === 'zip' ? 'postal-code' : 'address-line2'
                 }
